@@ -1,0 +1,6 @@
+{
+  "name": "هیوا",
+  "description": "اپلیکیشن یادآوری هوشمند داروها با قابلیت برنامه‌ریزی دوز مصرفی و افزایش انگیزه بیمار",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

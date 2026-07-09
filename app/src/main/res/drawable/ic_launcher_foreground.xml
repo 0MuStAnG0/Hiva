@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Capsule Pill Bottom (Purple/Pink glow) -->
+    <path
+        android:fillColor="#8C52FF"
+        android:pathData="M 45 66 C 45 74 51 80 59 80 C 67 80 73 74 73 66 L 73 52 L 45 52 Z" />
+
+    <!-- Capsule Pill Top (Cyan/Blue glow) -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 45 52 L 73 52 L 73 38 C 73 30 67 24 59 24 C 51 24 45 30 45 38 Z" />
+
+    <!-- Capsule Highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.4"
+        android:pathData="M 48 38 C 48 32 53 27 59 27 C 65 27 70 32 70 38 L 70 66 C 70 72 65 77 59 77 C 53 77 48 72 48 66 Z" />
+        
+    <!-- Capsule Internal Line -->
+    <path
+        android:fillColor="#151A30"
+        android:pathData="M 45 50 L 73 50 L 73 54 L 45 54 Z" />
+
+    <!-- Leaf Stem wrapping -->
+    <path
+        android:strokeColor="#00E676"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M 35 75 Q 45 60 59 52 T 80 40" />
+
+    <!-- Leaves -->
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M 35 45 C 35 35 45 35 45 45 C 45 55 35 55 35 45 Z" />
+        
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M 28 32 C 28 22 38 22 38 32 C 38 42 28 42 28 32 Z" />
+        
+</vector>
