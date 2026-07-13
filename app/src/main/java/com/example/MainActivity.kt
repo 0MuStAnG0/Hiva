@@ -15,6 +15,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -22,8 +24,11 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,58 +94,109 @@ class MainActivity : ComponentActivity() {
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentRoute = navBackStackEntry?.destination?.route
 
-                        Scaffold(
-                            containerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            bottomBar = {
-                                NavigationBar(
-                                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
-                                    tonalElevation = 0.dp
-                                ) {
-                                    NavigationBarItem(
+                        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                            val isWideScreen = maxWidth > 600.dp
 
-                                        icon = { androidx.compose.material3.Icon(Icons.Default.Home, contentDescription = "خانه") },
-                                        label = { androidx.compose.material3.Text("خانه") },
-                                        selected = currentRoute == "home",
-                                        onClick = {
-                                            navController.navigate("home") {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
+                            Row(modifier = Modifier.fillMaxSize()) {
+                                if (isWideScreen) {
+                                    NavigationRail(
+                                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
+                                    ) {
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        NavigationRailItem(
+                                            icon = { androidx.compose.material3.Icon(Icons.Default.Home, contentDescription = "خانه") },
+                                            label = { androidx.compose.material3.Text("خانه") },
+                                            selected = currentRoute == "home",
+                                            onClick = {
+                                                navController.navigate("home") {
+                                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
                                             }
-                                        }
-                                    )
-                                    NavigationBarItem(
-                                        icon = { androidx.compose.material3.Icon(Icons.Default.DateRange, contentDescription = "تقویم") },
-                                        label = { androidx.compose.material3.Text("تقویم") },
-                                        selected = currentRoute == "calendar",
-                                        onClick = {
-                                            navController.navigate("calendar") {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
+                                        )
+                                        NavigationRailItem(
+                                            icon = { androidx.compose.material3.Icon(Icons.Default.DateRange, contentDescription = "تقویم") },
+                                            label = { androidx.compose.material3.Text("تقویم") },
+                                            selected = currentRoute == "calendar",
+                                            onClick = {
+                                                navController.navigate("calendar") {
+                                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
                                             }
-                                        }
-                                    )
-                                    NavigationBarItem(
-                                        icon = { androidx.compose.material3.Icon(Icons.Default.Settings, contentDescription = "تنظیمات") },
-                                        label = { androidx.compose.material3.Text("تنظیمات") },
-                                        selected = currentRoute == "settings",
-                                        onClick = {
-                                            navController.navigate("settings") {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
+                                        )
+                                        NavigationRailItem(
+                                            icon = { androidx.compose.material3.Icon(Icons.Default.Settings, contentDescription = "تنظیمات") },
+                                            label = { androidx.compose.material3.Text("تنظیمات") },
+                                            selected = currentRoute == "settings",
+                                            onClick = {
+                                                navController.navigate("settings") {
+                                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
                                             }
-                                        }
-                                    )
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
                                 }
-                            }
-                        ) { innerPadding ->
-                            NavHost(
-                                navController = navController, 
-                                startDestination = "home",
-                                modifier = Modifier.padding(innerPadding)
-                            ) {
+
+                                Scaffold(
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    bottomBar = {
+                                        if (!isWideScreen) {
+                                            NavigationBar(
+                                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+                                                tonalElevation = 0.dp
+                                            ) {
+                                                NavigationBarItem(
+                                                    icon = { androidx.compose.material3.Icon(Icons.Default.Home, contentDescription = "خانه") },
+                                                    label = { androidx.compose.material3.Text("خانه") },
+                                                    selected = currentRoute == "home",
+                                                    onClick = {
+                                                        navController.navigate("home") {
+                                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                            launchSingleTop = true
+                                                            restoreState = true
+                                                        }
+                                                    }
+                                                )
+                                                NavigationBarItem(
+                                                    icon = { androidx.compose.material3.Icon(Icons.Default.DateRange, contentDescription = "تقویم") },
+                                                    label = { androidx.compose.material3.Text("تقویم") },
+                                                    selected = currentRoute == "calendar",
+                                                    onClick = {
+                                                        navController.navigate("calendar") {
+                                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                            launchSingleTop = true
+                                                            restoreState = true
+                                                        }
+                                                    }
+                                                )
+                                                NavigationBarItem(
+                                                    icon = { androidx.compose.material3.Icon(Icons.Default.Settings, contentDescription = "تنظیمات") },
+                                                    label = { androidx.compose.material3.Text("تنظیمات") },
+                                                    selected = currentRoute == "settings",
+                                                    onClick = {
+                                                        navController.navigate("settings") {
+                                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                            launchSingleTop = true
+                                                            restoreState = true
+                                                        }
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+                                ) { innerPadding ->
+                                    NavHost(
+                                        navController = navController, 
+                                        startDestination = "home",
+                                        modifier = Modifier.padding(innerPadding)
+                                    ) {
                                 composable("home") {
                                     HomeScreen(
                                         viewModel = viewModel,
@@ -189,6 +245,8 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
+                        }
+                        }
                         }
                     }
                 }

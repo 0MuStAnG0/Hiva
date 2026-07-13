@@ -114,8 +114,6 @@ fun MedicationCalendarCard(medication: Medication, logs: List<MedicationLog>) {
             val totalCells = startOffset + daysInMonth
             val rows = Math.ceil(totalCells / 7.0).toInt()
             
-            val skipInterval = (medication.skipIntervalDays ?: 0) + 1
-            
             for (row in 0 until rows) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     for (col in 0 until 7) {
@@ -130,7 +128,27 @@ fun MedicationCalendarCard(medication: Medication, logs: List<MedicationLog>) {
                                 set(Calendar.DAY_OF_MONTH, day)
                             }.timeInMillis / 86400000L
                             
-                            val isConsumptionDay = epochDay % skipInterval == (medication.id % skipInterval).toLong()
+                            val isConsumptionDay = if (medication.type == "INJECTION") {
+                                val interval = medication.injectionIntervalDays ?: 0
+                                if (interval > 0) {
+                                    epochDay % interval == (medication.id % interval).toLong()
+                                } else {
+                                    true
+                                }
+                            } else {
+                                val consumption = medication.cycleConsumptionDays ?: 0
+                                val rest = medication.cycleRestDays ?: 0
+                                val skipInterval = medication.skipIntervalDays ?: 0
+                                if (consumption > 0 && rest > 0) {
+                                    val totalCycle = consumption + rest
+                                    val dayInCycle = (epochDay + medication.id) % totalCycle
+                                    dayInCycle < consumption
+                                } else if (skipInterval > 0) {
+                                    epochDay % skipInterval != (medication.id % skipInterval).toLong()
+                                } else {
+                                    true
+                                }
+                            }
                             
                             val isTaken = logs.any { 
                                 val logCal = Calendar.getInstance().apply { timeInMillis = it.takenAtMillis }
@@ -143,14 +161,13 @@ fun MedicationCalendarCard(medication: Medication, logs: List<MedicationLog>) {
                                     .clip(CircleShape)
                                     .background(
                                         when {
-                                            isTaken -> MaterialTheme.colorScheme.primary
-                                            isConsumptionDay -> MaterialTheme.colorScheme.primaryContainer
+                                            isTaken || isConsumptionDay -> MaterialTheme.colorScheme.primary
                                             else -> androidx.compose.ui.graphics.Color.Transparent
                                         }
                                     )
                                     .border(
-                                        width = if (isToday) 2.dp else 0.dp,
-                                        color = if (isToday) MaterialTheme.colorScheme.primary else androidx.compose.ui.graphics.Color.Transparent,
+                                        width = if (isToday) 2.dp else if (!isConsumptionDay && !isTaken) 1.dp else 0.dp,
+                                        color = if (isToday) MaterialTheme.colorScheme.primary else if (!isConsumptionDay && !isTaken) MaterialTheme.colorScheme.outline else androidx.compose.ui.graphics.Color.Transparent,
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
@@ -158,8 +175,7 @@ fun MedicationCalendarCard(medication: Medication, logs: List<MedicationLog>) {
                                 Text(
                                     text = day.toString(),
                                     color = when {
-                                        isTaken -> MaterialTheme.colorScheme.onPrimary
-                                        isConsumptionDay -> MaterialTheme.colorScheme.onPrimaryContainer
+                                        isTaken || isConsumptionDay -> MaterialTheme.colorScheme.onPrimary
                                         else -> MaterialTheme.colorScheme.onSurface
                                     },
                                     style = MaterialTheme.typography.bodyMedium
@@ -177,13 +193,13 @@ fun MedicationCalendarCard(medication: Medication, logs: List<MedicationLog>) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("مصرف شده", style = MaterialTheme.typography.bodySmall)
+                Text(if (medication.type == "INJECTION") "روزهای تزریق" else "روزهای مصرف", style = MaterialTheme.typography.bodySmall)
                 
                 Spacer(modifier = Modifier.width(16.dp))
                 
-                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer))
+                Box(modifier = Modifier.size(12.dp).clip(CircleShape).border(1.dp, MaterialTheme.colorScheme.outline, CircleShape).background(androidx.compose.ui.graphics.Color.Transparent))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("روز مصرف", style = MaterialTheme.typography.bodySmall)
+                Text("روزهای عدم مصرف/استراحت", style = MaterialTheme.typography.bodySmall)
             }
         }
     }

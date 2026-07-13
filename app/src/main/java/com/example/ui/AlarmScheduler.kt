@@ -49,11 +49,24 @@ class AlarmScheduler(private val context: Context) {
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                 }
                 
-                val skipInterval = (medication.skipIntervalDays ?: 0) + 1
                 var maxLookahead = 30
                 while (maxLookahead > 0) {
                     val epochDay = calendar.timeInMillis / 86400000L
-                    val isConsumptionDay = epochDay % skipInterval == (medication.id % skipInterval).toLong()
+                    val isConsumptionDay = if (medication.type == "INJECTION") {
+                        val interval = medication.injectionIntervalDays ?: 0
+                        if (interval > 0) {
+                            epochDay % interval == (medication.id % interval).toLong()
+                        } else {
+                            true
+                        }
+                    } else {
+                        val skipInterval = medication.skipIntervalDays ?: 0
+                        if (skipInterval > 0) {
+                            epochDay % skipInterval != (medication.id % skipInterval).toLong()
+                        } else {
+                            true
+                        }
+                    }
                     
                     if (isConsumptionDay) {
                         break

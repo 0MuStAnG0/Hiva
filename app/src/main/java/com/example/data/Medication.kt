@@ -14,6 +14,12 @@ data class Medication(
     val nextDoseAmount: String = "", // for dose change
     val nextDoseDateMillis: Long? = null, // when the dose change happens
     val nextDoseDurationDays: Int? = null, // how many days the new dose will last
+    val type: String = "PILL", // "PILL" or "INJECTION"
+    val injectionCount: Int? = null,
+    val injectionIntervalDays: Int? = null,
+    val doseFrequencyHours: Int? = null, // e.g. 6, 8, 12. If null, then once a day
+    val cycleConsumptionDays: Int? = null,
+    val cycleRestDays: Int? = null,
     val isActive: Boolean = true
 )
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.BuildConfig
 import com.example.data.AppFontSize
 import com.example.data.AppThemeMode
 import com.example.data.SettingsRepository
@@ -156,7 +157,7 @@ fun SettingsScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "نسخه کنونی: 1.0.0",
+                text = "نسخه کنونی: ${BuildConfig.VERSION_NAME}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.CenterHorizontally)

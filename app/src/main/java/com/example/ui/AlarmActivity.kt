@@ -93,7 +93,7 @@ class AlarmActivity : ComponentActivity() {
                         )
                         Spacer(modifier = Modifier.height(32.dp))
                         Text(
-                            text = "الان موقع مصرف داروی شماست",
+                            text = "الان موقع مصرف دارو یا تزریق شماست",
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             textAlign = TextAlign.Center
@@ -101,7 +101,7 @@ class AlarmActivity : ComponentActivity() {
                         Spacer(modifier = Modifier.height(16.dp))
                         if (medName.isNotEmpty()) {
                             Text(
-                                text = "دارو: $medName",
+                                text = "مورد مصرف: $medName",
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,

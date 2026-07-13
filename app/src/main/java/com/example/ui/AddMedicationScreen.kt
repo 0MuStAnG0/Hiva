@@ -41,7 +41,12 @@ fun AddMedicationScreen(
         }
     }
     
-    var skipIntervalDays by remember { mutableStateOf(initialMedication?.skipIntervalDays?.toString() ?: "") }
+    var cycleConsumptionDays by remember { mutableStateOf(initialMedication?.cycleConsumptionDays?.toString() ?: "") }
+    var cycleRestDays by remember { mutableStateOf(initialMedication?.cycleRestDays?.toString() ?: "") }
+    var skipIntervalDays by remember { mutableStateOf(initialMedication?.skipIntervalDays?.toString() ?: "") } // Keep for backward compatibility or remove later
+    var injectionCount by remember { mutableStateOf(initialMedication?.injectionCount?.toString() ?: "") }
+    var injectionIntervalDays by remember { mutableStateOf(initialMedication?.injectionIntervalDays?.toString() ?: "") }
+    var doseFrequencyHours by remember { mutableStateOf<Int?>(initialMedication?.doseFrequencyHours) }
     
     var hasDoseChange by remember { mutableStateOf(initialMedication?.nextDoseDateMillis != null) }
     var nextDose by remember { mutableStateOf(initialMedication?.nextDoseAmount ?: "") }
@@ -51,11 +56,13 @@ fun AddMedicationScreen(
         } else ""
     ) }
 
+    var type by remember { mutableStateOf(initialMedication?.type ?: "PILL") }
+
     Scaffold(
         containerColor = androidx.compose.ui.graphics.Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text(if (initialMedication == null) "افزودن داروی جدید" else "ویرایش دارو") },
+                title = { Text(if (initialMedication == null) "افزودن یادآور جدید" else "ویرایش یادآور") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -73,10 +80,26 @@ fun AddMedicationScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            TabRow(
+                selectedTabIndex = if (type == "PILL") 0 else 1,
+                containerColor = androidx.compose.ui.graphics.Color.Transparent
+            ) {
+                Tab(
+                    selected = type == "PILL",
+                    onClick = { type = "PILL" },
+                    text = { Text("یادآور دارو") }
+                )
+                Tab(
+                    selected = type == "INJECTION",
+                    onClick = { type = "INJECTION" },
+                    text = { Text("یادآور تزریق") }
+                )
+            }
+            
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("نام دارو") },
+                label = { Text(if (type == "PILL") "نام دارو" else "نام آمپول/داروی تزریقی") },
                 modifier = Modifier.fillMaxWidth().testTag("med_name_input"),
                 singleLine = true
             )
@@ -84,13 +107,54 @@ fun AddMedicationScreen(
             OutlinedTextField(
                 value = dose,
                 onValueChange = { dose = it },
-                label = { Text("مقدار مصرف فعلی (مثلاً ۱ قرص یا ۵۰۰ میلی‌گرم)") },
+                label = { Text(if (type == "PILL") "مقدار مصرف (مثلاً ۱ قرص)" else "مقدار مصرف (مثلاً ۱ آمپول یا سی‌سی)") },
                 modifier = Modifier.fillMaxWidth().testTag("med_dose_input"),
                 singleLine = true
             )
 
             val context = LocalContext.current
             
+            Text("فاصله زمانی مصرف در روز (اختیاری):", style = MaterialTheme.typography.titleMedium)
+            
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = doseFrequencyHours == null,
+                        onClick = { doseFrequencyHours = null; timesList.clear(); timesList.add("08:00") },
+                        label = { Text("یکبار در روز") }
+                    )
+                    FilterChip(
+                        selected = doseFrequencyHours == 6,
+                        onClick = { 
+                            doseFrequencyHours = 6
+                            timesList.clear()
+                            timesList.addAll(listOf("06:00", "12:00", "18:00", "00:00"))
+                        },
+                        label = { Text("هر ۶ ساعت") }
+                    )
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = doseFrequencyHours == 8,
+                        onClick = { 
+                            doseFrequencyHours = 8
+                            timesList.clear()
+                            timesList.addAll(listOf("08:00", "16:00", "00:00"))
+                        },
+                        label = { Text("هر ۸ ساعت") }
+                    )
+                    FilterChip(
+                        selected = doseFrequencyHours == 12,
+                        onClick = { 
+                            doseFrequencyHours = 12
+                            timesList.clear()
+                            timesList.addAll(listOf("08:00", "20:00"))
+                        },
+                        label = { Text("هر ۱۲ ساعت") }
+                    )
+                }
+            }
+
             Text("زمان‌های مصرف:", style = MaterialTheme.typography.titleMedium)
             
             timesList.forEachIndexed { index, timeVal ->
@@ -141,14 +205,43 @@ fun AddMedicationScreen(
                 Text("+ افزودن زمان جدید")
             }
             
-            OutlinedTextField(
-                value = skipIntervalDays,
-                onValueChange = { skipIntervalDays = it },
-                label = { Text("سیکل روزهای عدم مصرف (اختیاری، مثلا هر ۱۰ روز)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth().testTag("med_skip_days_input"),
-                singleLine = true
-            )
+            if (type == "PILL") {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = cycleConsumptionDays,
+                        onValueChange = { cycleConsumptionDays = it },
+                        label = { Text("سیکل روزانه مصرف (مثلاً ۲۱ روز)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.weight(1f).testTag("med_cycle_consumption_input"),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = cycleRestDays,
+                        onValueChange = { cycleRestDays = it },
+                        label = { Text("فاصله مجدد مصرف (مثلاً ۷ روز)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.weight(1f).testTag("med_cycle_rest_input"),
+                        singleLine = true
+                    )
+                }
+            } else {
+                OutlinedTextField(
+                    value = injectionCount,
+                    onValueChange = { injectionCount = it },
+                    label = { Text("تعداد آمپول") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth().testTag("med_injection_count_input"),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = injectionIntervalDays,
+                    onValueChange = { injectionIntervalDays = it },
+                    label = { Text("فاصله تزریق بعدی بر اساس روز (مثلاً هر ۳ روز)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth().testTag("med_injection_interval_input"),
+                    singleLine = true
+                )
+            }
 
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -210,9 +303,15 @@ fun AddMedicationScreen(
                         timeOfDay = timesList.joinToString(","),
                         daysOfWeek = "0,1,2,3,4,5,6", // Default all days for simplicity
                         skipIntervalDays = skipIntervalDays.toIntOrNull(),
+                        cycleConsumptionDays = cycleConsumptionDays.toIntOrNull(),
+                        cycleRestDays = cycleRestDays.toIntOrNull(),
                         nextDoseAmount = nextDose,
                         nextDoseDateMillis = targetDate,
-                        nextDoseDurationDays = null
+                        nextDoseDurationDays = null,
+                        type = type,
+                        injectionCount = injectionCount.toIntOrNull(),
+                        injectionIntervalDays = injectionIntervalDays.toIntOrNull(),
+                        doseFrequencyHours = doseFrequencyHours
                     )
                     onSave(med)
                 },

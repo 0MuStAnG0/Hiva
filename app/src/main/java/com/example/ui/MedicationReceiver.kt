@@ -68,8 +68,8 @@ class MedicationReceiver : BroadcastReceiver() {
 
         val notification = NotificationCompat.Builder(context, "med_channel")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("یادآوری مصرف دارو")
-            .setContentText("زمان مصرف $medName ($medDose) فرا رسیده است.")
+            .setContentTitle("یادآوری مصرف / تزریق")
+            .setContentText("زمان مصرف یا تزریق $medName ($medDose) فرا رسیده است.")
             .setContentIntent(fullScreenPendingIntent)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
